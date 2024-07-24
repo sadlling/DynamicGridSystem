@@ -25,7 +25,7 @@ const Grid = () => {
   setTimeout(() => setLoading(false), 1000);
 
   const sampleData = [
-    { id: 1, values: ["John Doe", "25", "john@example.com"] },
+    { id: 1, values: ["John Doe"] },
     { id: 2, values: ["Jane Smith", "30", "jane@example.com"] },
     { id: 3, values: ["Sam Green", "35", "sam@example.com"] },
   ];

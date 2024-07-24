@@ -27,12 +27,17 @@ interface DataTableProps {
 
 export const ActiveGrid: React.FC<DataTableProps> = ({ data }) => {
   const [columns, setColumns] = useState(1);
-
   const addColumn = () => setColumns((prev) => prev + 1);
   const removeColumn = () => setColumns((prev) => (prev > 1 ? prev - 1 : 1));
-  // const data = [
-  //   { id: 1, name: "John Doe", age: 25, email: "john@example.com" },
-  // ];
+
+  const transformedData = Array.from({ length: columns }, (_, colIndex) =>
+    data.map((row) => row.values[colIndex] || "")
+  );
+  transformedData.forEach((column) => {
+    for (let i = 0; i < 2; i++) {
+      column.push("");
+    }
+  });
 
   return (
     <Box
@@ -62,24 +67,27 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data }) => {
                   colorScheme="teal"
                   aria-label="Add Column"
                   icon={<AddIcon />}
+                  onClick={addColumn}
                 />
               </Tr>
             </Thead>
             <Tbody>
-              {data.map((item) => (
-                <Tr key={item.id}>
-                  {item.values.slice(0, columns).map((value, i) => (
-                    <Td key={i}>{value}</Td>
-                  ))}
-                </Tr>
-              ))}
+              {Array.from(
+                { length: Math.max(data.length + 2, 1) },
+                (_, rowIndex) => (
+                  <Tr key={rowIndex}>
+                    {transformedData.map((columnData, colIndex) => (
+                      <Td key={colIndex} border="1px" borderColor="teal">
+                        {columnData[rowIndex] || ""}
+                      </Td>
+                    ))}
+                  </Tr>
+                )
+              )}
             </Tbody>
           </Table>
         </TableContainer>
         <div>
-          <Button onClick={addColumn} colorScheme="teal" m={2}>
-            Add Column
-          </Button>
           <Button onClick={removeColumn} colorScheme="teal" m={2}>
             Remove Column
           </Button>
