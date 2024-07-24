@@ -26,10 +26,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpen }) => {
       gap={4}
     >
       <IconButton
-        display={{ base: "block", md: "none" }}
+        display={{ base: "block", xl: "none" }}
         onClick={onOpen}
         icon={<HamburgerIcon></HamburgerIcon>}
-        aria-label="Открыть меню"
+        aria-label="Open menu"
         variant="outline"
         mr={3}
       />
