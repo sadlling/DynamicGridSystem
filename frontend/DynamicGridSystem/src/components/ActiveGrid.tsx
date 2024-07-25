@@ -1,43 +1,55 @@
-import { AddIcon } from "@chakra-ui/icons";
+import { AddIcon, CloseIcon } from "@chakra-ui/icons";
 import {
-  Table,
-  TableCaption,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
   Flex,
   Box,
   useColorModeValue,
-  IconButton,
   Button,
+  HStack,
+  VStack,
+  IconButton,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import Cell from "./Cell";
 
+interface Column {
+  id: number;
+  rows: string[];
+}
 interface TableData {
   id: number;
   values: string[];
 }
-
 interface DataTableProps {
   data: TableData[];
 }
 
 export const ActiveGrid: React.FC<DataTableProps> = ({ data }) => {
-  const [columns, setColumns] = useState(1);
-  const addColumn = () => setColumns((prev) => prev + 1);
-  const removeColumn = () => setColumns((prev) => (prev > 1 ? prev - 1 : 1));
+  const [columns, setColumns] = useState<Column[]>([
+    { id: 1, rows: ["", ""] }, // Изначальная колонка с пустыми строками
+  ]);
 
-  const transformedData = Array.from({ length: columns }, (_, colIndex) =>
-    data.map((row) => row.values[colIndex] || "")
-  );
-  transformedData.forEach((column) => {
-    for (let i = 0; i < 2; i++) {
-      column.push("");
-    }
-  });
+  const addColumn = () => {
+    const newColumn: Column = {
+      id: columns.length + 1,
+      rows: ["", ""],
+    };
+    setColumns([...columns, newColumn]);
+  };
+  // const removeColumn = () => {
+  //   console.log(columns.splice(0, columns.length - 1));
+  //   setColumns(columns.splice(0, columns.length - 1));
+  // };
+
+  const handleCellChange = (
+    columnIndex: number,
+    rowIndex: number,
+    newValue: string
+  ) => {
+    console.log(newValue);
+    const newColumns = [...columns];
+    newColumns[columnIndex].rows[rowIndex] = newValue;
+    setColumns(newColumns);
+  };
 
   return (
     <Box
@@ -56,42 +68,56 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data }) => {
         flexDirection={"column"}
         // justifyContent={"end"}
       >
-        <TableContainer>
-          <Table colorScheme="teal" w={"20vw"}>
-            <Thead>
-              <Tr>
-                {Array.from({ length: columns }, (_, i) => (
-                  <Th key={i}>Column {i + 1}</Th>
-                ))}
-                <IconButton
-                  colorScheme="teal"
-                  aria-label="Add Column"
-                  icon={<AddIcon />}
-                  onClick={addColumn}
-                />
-              </Tr>
-            </Thead>
-            <Tbody>
-              {Array.from(
-                { length: Math.max(data.length + 2, 1) },
-                (_, rowIndex) => (
-                  <Tr key={rowIndex}>
-                    {transformedData.map((columnData, colIndex) => (
-                      <Td key={colIndex} border="1px" borderColor="teal">
-                        {columnData[rowIndex] || ""}
-                      </Td>
-                    ))}
-                  </Tr>
-                )
-              )}
-            </Tbody>
-          </Table>
-        </TableContainer>
-        <div>
+        <Box p={4}>
+          <HStack align="start" gap={0}>
+            {columns.map((column, columnIndex) => (
+              <VStack
+                key={column.id}
+                border="1px"
+                borderColor="teal.800"
+                gap={0}
+              >
+                {column.rows.map((row, rowIndex) =>
+                  rowIndex === 0 ? (
+                    <Cell
+                      key={rowIndex}
+                      value={row}
+                      placeholder={"Column " + Number(columnIndex + 1)}
+                      onChange={(newValue) =>
+                        handleCellChange(columnIndex, rowIndex, newValue)
+                      }
+                    />
+                  ) : (
+                    <Cell
+                      key={rowIndex}
+                      value={row}
+                      onChange={(newValue) =>
+                        handleCellChange(columnIndex, rowIndex, newValue)
+                      }
+                    />
+                  )
+                )}
+              </VStack>
+            ))}
+            <IconButton
+              colorScheme="teal"
+              aria-label="Add column"
+              icon={<AddIcon />}
+              onClick={addColumn}
+            />
+            {/* <IconButton
+              colorScheme="teal"
+              aria-label="Remove column"
+              icon={<CloseIcon />}
+              onClick={removeColumn}
+            /> */}
+          </HStack>
+        </Box>
+        {/* <div>
           <Button onClick={removeColumn} colorScheme="teal" m={2}>
             Remove Column
           </Button>
-        </div>
+        </div> */}
       </Flex>
     </Box>
   );
