@@ -24,11 +24,11 @@ const Grid = () => {
 
   setTimeout(() => setLoading(false), 1000);
 
-  const sampleData = [
-    { id: 1, values: [""] },
-    // { id: 2, values: ["Jane Smith", "30", "jane@example.com"] },
-    // { id: 3, values: ["Sam Green", "35", "sam@example.com"] },
-  ];
+  // const sampleData = [
+  //   { id: 1, values: [""] },
+  //   // { id: 2, values: ["Jane Smith", "30", "jane@example.com"] },
+  //   // { id: 3, values: ["Sam Green", "35", "sam@example.com"] },
+  // ];
 
   return loading ? (
     <Loader></Loader>
@@ -58,7 +58,8 @@ const Grid = () => {
           </DrawerOverlay>
         </Drawer>
         <Box w={{ base: "full", md: "90%" }} pl={2} pr={2}>
-          <ActiveGrid data={sampleData}></ActiveGrid>
+          {/* data={sampleData} */}
+          <ActiveGrid></ActiveGrid>
         </Box>
       </Flex>
     </Flex>

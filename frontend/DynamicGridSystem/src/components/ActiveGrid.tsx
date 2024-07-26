@@ -11,8 +11,9 @@ import {
   Th,
   Tbody,
   Td,
+  Input,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import React, { useState } from "react";
 
 interface TableData {
   id: number;
@@ -21,7 +22,7 @@ interface TableData {
 
 // Определяем интерфейс для пропсов компонента таблицы
 interface DataTableProps {
-  data: TableData[];
+  data?: TableData[];
   columns?: number;
 }
 
@@ -31,10 +32,24 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
     { id: 2, values: [""] },
     { id: 3, values: [""] },
   ];
+  //Table data
   const [tableData, setTableData] = useState<TableData[]>(
     data.length == 0 ? initialData : data
   );
+
+  //change columns count
   const [columns, setColumns] = useState<number>(1);
+  //editing cells
+  const [editingCell, setEditingCell] = useState<{
+    rowIndex: number;
+    colIndex: number;
+  } | null>(null);
+
+  //editing column head
+  const [editingColumnHead, setEditingColumnHead] = useState<{
+    colIndex: number;
+  } | null>(null);
+  const [columnHeadValue, setColumnHeadValue] = useState("Column ");
 
   const addColumn = () => {
     setColumns(columns + 1);
@@ -54,6 +69,38 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
         })
       );
     }
+  };
+  const handleCellClick = (rowIndex: number, colIndex: number) => {
+    setEditingCell({ rowIndex, colIndex });
+  };
+  const handleInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    rowIndex: number,
+    colIndex: number
+  ) => {
+    const newValue = event.target.value;
+    setTableData((prevData) => {
+      const newData = [...prevData];
+      newData[rowIndex].values[colIndex] = newValue;
+      return newData;
+    });
+  };
+  const handleInputBlur = () => {
+    setEditingCell(null);
+  };
+
+  const handleColumnHeadClick = (colIndex: number) => {
+    setEditingColumnHead({ colIndex });
+  };
+  const handleColumnHeadBlur = () => {
+    setEditingColumnHead(null);
+  };
+
+  const handleColumnHeadChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newValue = event.target.value;
+    setColumnHeadValue(newValue);
   };
 
   return (
@@ -78,9 +125,24 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
             <Table colorScheme="teal" w={"25%"}>
               <Thead>
                 <Tr>
-                  {Array.from({ length: columns }, (_, i) => (
-                    <Th key={i} border="1px" borderColor="teal.200">
-                      Column {i + 1}
+                  {Array.from({ length: columns }, (_, colIndex) => (
+                    <Th
+                      key={colIndex}
+                      border="1px"
+                      borderColor="teal.200"
+                      onClick={() => handleColumnHeadClick(colIndex)}
+                    >
+                      {editingColumnHead?.colIndex == colIndex ? (
+                        <Input
+                          value={columnHeadValue}
+                          size={"sm"}
+                          variant={"unstyled"}
+                          onChange={(event) => handleColumnHeadChange(event)} //Fix editing
+                          onBlur={handleColumnHeadBlur}
+                        ></Input>
+                      ) : (
+                        columnHeadValue
+                      )}
                     </Th>
                   ))}
                   <Flex gap={1} ml={2}>
@@ -104,11 +166,30 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                 </Tr>
               </Thead>
               <Tbody>
-                {tableData.map((item) => (
+                {tableData.map((item, rowIndex) => (
                   <Tr key={item.id}>
-                    {item.values.slice(0, columns).map((value, i) => (
-                      <Td key={i} border="1px" borderColor="teal.200">
-                        {value}{" "}
+                    {item.values.slice(0, columns).map((value, colIndex) => (
+                      <Td
+                        key={colIndex}
+                        border="1px"
+                        borderColor="teal.200"
+                        onClick={() => handleCellClick(rowIndex, colIndex)}
+                      >
+                        {editingCell?.rowIndex === rowIndex &&
+                        editingCell?.colIndex === colIndex ? (
+                          <Input
+                            value={value}
+                            size={"sm"}
+                            variant={"unstyled"}
+                            onChange={(event) =>
+                              handleInputChange(event, rowIndex, colIndex)
+                            }
+                            onBlur={handleInputBlur}
+                            autoFocus
+                          />
+                        ) : (
+                          value ?? "asdasd"
+                        )}
                       </Td>
                     ))}
                   </Tr>
