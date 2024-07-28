@@ -1,4 +1,4 @@
-import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon, TriangleDownIcon } from "@chakra-ui/icons";
 import {
   Flex,
   Box,
@@ -12,6 +12,11 @@ import {
   Tbody,
   Td,
   Input,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Button,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -144,7 +149,7 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                       minWidth={"150px"}
                       border="1px"
                       borderColor="teal.200"
-                      onClick={() => handleHeaderClick(colIndex)}
+                      onDoubleClick={() => handleHeaderClick(colIndex)}
                     >
                       {editingHeader === colIndex ? (
                         <Input
@@ -158,7 +163,35 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                           width={"100%"}
                         />
                       ) : (
-                        columnHeaders[colIndex]
+                        <Box w={"100%"} gap={4}>
+                          {columnHeaders[colIndex]}
+                          {/* <Select
+                            variant="unstyled"
+                            display={"inline"}
+                            size={"xs"}
+                            ml={-50}
+                          /> */}
+                          {/* <IconButton
+                            colorScheme="teal"
+                            aria-label="Dropdown"
+                            variant="outline"
+                            size={"xs"}
+                            ml={4}
+                            icon={<TriangleDownIcon />}
+                          /> */}
+                          <Menu>
+                            <MenuButton
+                              as={IconButton}
+                              aria-label="Options"
+                              icon={<TriangleDownIcon />}
+                              variant="unstyled"
+                            />
+                            <MenuList>
+                              <MenuItem>String</MenuItem>
+                              <MenuItem>Regex</MenuItem>
+                            </MenuList>
+                          </Menu>
+                        </Box>
                       )}
                     </Th>
                   ))}
