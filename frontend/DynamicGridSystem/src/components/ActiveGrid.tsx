@@ -13,7 +13,7 @@ import {
   Td,
   Input,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface TableData {
   id: number;
@@ -32,6 +32,18 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
     { id: 2, values: [""] },
     { id: 3, values: [""] },
   ];
+
+  //Column head data
+  const [columnHeaders, setColumnHeaders] = useState<string[]>(["Column 1"]);
+  //editing column head
+  const [editingHeader, setEditingHeader] = useState<number | null>(null);
+  const headerInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (editingHeader !== null && headerInputRef.current) {
+      headerInputRef.current.focus();
+    }
+  }, [editingHeader]);
   //Table data
   const [tableData, setTableData] = useState<TableData[]>(
     data.length == 0 ? initialData : data
@@ -45,14 +57,9 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
     colIndex: number;
   } | null>(null);
 
-  //editing column head
-  const [editingColumnHead, setEditingColumnHead] = useState<{
-    colIndex: number;
-  } | null>(null);
-  const [columnHeadValue, setColumnHeadValue] = useState("Column ");
-
   const addColumn = () => {
     setColumns(columns + 1);
+    setColumnHeaders([...columnHeaders, `Column ${columns + 1}`]);
     setTableData(
       tableData.map((row) => ({ ...row, values: [...row.values, ""] }))
     );
@@ -61,6 +68,7 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
   const removeColumn = () => {
     if (columns > 1) {
       setColumns(columns - 1);
+      setColumnHeaders(columnHeaders.slice(0, -1));
       setTableData(
         tableData.map((row) => {
           const newValues = [...row.values];
@@ -82,25 +90,30 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
     setTableData((prevData) => {
       const newData = [...prevData];
       newData[rowIndex].values[colIndex] = newValue;
-      return newData;
+      return newData; //check values in console
     });
   };
   const handleInputBlur = () => {
     setEditingCell(null);
   };
 
-  const handleColumnHeadClick = (colIndex: number) => {
-    setEditingColumnHead({ colIndex });
+  const handleHeaderClick = (colIndex: number) => {
+    setEditingHeader(colIndex);
   };
-  const handleColumnHeadBlur = () => {
-    setEditingColumnHead(null);
+  const handleHeaderBlur = () => {
+    setEditingHeader(null);
   };
 
-  const handleColumnHeadChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+  const handleHeaderChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    colIndex: number
   ) => {
     const newValue = event.target.value;
-    setColumnHeadValue(newValue);
+    setColumnHeaders((prevHeaders) => {
+      const newHeaders = [...prevHeaders];
+      newHeaders[colIndex] = newValue;
+      return newHeaders;
+    });
   };
 
   return (
@@ -128,20 +141,24 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                   {Array.from({ length: columns }, (_, colIndex) => (
                     <Th
                       key={colIndex}
+                      minWidth={"150px"}
                       border="1px"
                       borderColor="teal.200"
-                      onClick={() => handleColumnHeadClick(colIndex)}
+                      onClick={() => handleHeaderClick(colIndex)}
                     >
-                      {editingColumnHead?.colIndex == colIndex ? (
+                      {editingHeader === colIndex ? (
                         <Input
-                          value={columnHeadValue}
-                          size={"sm"}
                           variant={"unstyled"}
-                          onChange={(event) => handleColumnHeadChange(event)} //Fix editing
-                          onBlur={handleColumnHeadBlur}
-                        ></Input>
+                          value={columnHeaders[colIndex]}
+                          onChange={(event) =>
+                            handleHeaderChange(event, colIndex)
+                          }
+                          onBlur={handleHeaderBlur}
+                          autoFocus
+                          width={"100%"}
+                        />
                       ) : (
-                        columnHeadValue
+                        columnHeaders[colIndex]
                       )}
                     </Th>
                   ))}
