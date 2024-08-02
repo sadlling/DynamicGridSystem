@@ -16,9 +16,8 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Button,
 } from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 
 interface TableData {
   id: number;
@@ -33,22 +32,16 @@ interface DataTableProps {
 
 export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
   const initialData: TableData[] = [
-    { id: 1, values: [""] },
+    { id: 1, values: ["qwe,123"] },
     { id: 2, values: [""] },
-    { id: 3, values: [""] },
+    { id: 3, values: ["asd"] },
   ];
 
   //Column head data
   const [columnHeaders, setColumnHeaders] = useState<string[]>(["Column 1"]);
   //editing column head
   const [editingHeader, setEditingHeader] = useState<number | null>(null);
-  const headerInputRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    if (editingHeader !== null && headerInputRef.current) {
-      headerInputRef.current.focus();
-    }
-  }, [editingHeader]);
   //Table data
   const [tableData, setTableData] = useState<TableData[]>(
     data.length == 0 ? initialData : data
@@ -121,6 +114,15 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
     });
   };
 
+  const addRow = () => {
+    const newRow: TableData = {
+      id: tableData.length + 1,
+      values: Array(columns).fill(""),
+    };
+    setTableData([...tableData, newRow]);
+    console.log(tableData);
+  };
+
   return (
     <Box
       h="full"
@@ -148,7 +150,7 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                       key={colIndex}
                       minWidth={"150px"}
                       border="1px"
-                      borderColor="teal.200"
+                      borderColor="teal"
                       onDoubleClick={() => handleHeaderClick(colIndex)}
                     >
                       {editingHeader === colIndex ? (
@@ -165,20 +167,6 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                       ) : (
                         <Box w={"100%"} gap={4}>
                           {columnHeaders[colIndex]}
-                          {/* <Select
-                            variant="unstyled"
-                            display={"inline"}
-                            size={"xs"}
-                            ml={-50}
-                          /> */}
-                          {/* <IconButton
-                            colorScheme="teal"
-                            aria-label="Dropdown"
-                            variant="outline"
-                            size={"xs"}
-                            ml={4}
-                            icon={<TriangleDownIcon />}
-                          /> */}
                           <Menu>
                             <MenuButton
                               as={IconButton}
@@ -222,7 +210,7 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                       <Td
                         key={colIndex}
                         border="1px"
-                        borderColor="teal.200"
+                        borderColor="teal"
                         onClick={() => handleCellClick(rowIndex, colIndex)}
                       >
                         {editingCell?.rowIndex === rowIndex &&
@@ -247,6 +235,15 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
               </Tbody>
             </Table>
           </TableContainer>
+          <IconButton
+            mt={2}
+            colorScheme="teal"
+            aria-label="Add row"
+            variant="outline"
+            size={"sm"}
+            icon={<AddIcon />}
+            onClick={addRow}
+          />
         </Box>
       </Flex>
     </Box>
