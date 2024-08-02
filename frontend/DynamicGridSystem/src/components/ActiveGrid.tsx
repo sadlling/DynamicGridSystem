@@ -32,8 +32,8 @@ interface DataTableProps {
 
 export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
   const initialData: TableData[] = [
-    { id: 1, values: ["qwe,123"] },
-    { id: 2, values: [""] },
+    { id: 1, values: ["qwe,123,4"] },
+    { id: 2, values: ["11"] },
     { id: 3, values: ["asd"] },
   ];
 
@@ -120,7 +120,11 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
       values: Array(columns).fill(""),
     };
     setTableData([...tableData, newRow]);
-    console.log(tableData);
+  };
+  const removeRow = () => {
+    if (tableData.length > 1) {
+      setTableData(tableData.slice(0, -1));
+    }
   };
 
   return (
@@ -176,7 +180,11 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                             />
                             <MenuList>
                               <MenuItem>String</MenuItem>
+                              <MenuItem>Numeric</MenuItem>
                               <MenuItem>Regex</MenuItem>
+                              <MenuItem>SingleSelect</MenuItem>
+                              <MenuItem>MultiSelect</MenuItem>
+                              <MenuItem>ExternalCoolection</MenuItem>
                             </MenuList>
                           </Menu>
                         </Box>
@@ -208,6 +216,7 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                   <Tr key={item.id}>
                     {item.values.slice(0, columns).map((value, colIndex) => (
                       <Td
+                        padding={4}
                         key={colIndex}
                         border="1px"
                         borderColor="teal"
@@ -235,15 +244,24 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
               </Tbody>
             </Table>
           </TableContainer>
-          <IconButton
-            mt={2}
-            colorScheme="teal"
-            aria-label="Add row"
-            variant="outline"
-            size={"sm"}
-            icon={<AddIcon />}
-            onClick={addRow}
-          />
+          <Flex gap={1} mt={2}>
+            <IconButton
+              colorScheme="teal"
+              aria-label="Add row"
+              variant="outline"
+              size={"sm"}
+              icon={<AddIcon />}
+              onClick={addRow}
+            />
+            <IconButton
+              colorScheme="teal"
+              variant="outline"
+              aria-label="Remove row"
+              size={"sm"}
+              icon={<DeleteIcon />}
+              onClick={removeRow}
+            />
+          </Flex>
         </Box>
       </Flex>
     </Box>
