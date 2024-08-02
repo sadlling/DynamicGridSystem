@@ -16,6 +16,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Checkbox,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 
@@ -64,7 +65,7 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
   };
 
   const removeColumn = () => {
-    if (columns > 1) {
+    if (columns > 2) {
       setColumns(columns - 1);
       setColumnHeaders(columnHeaders.slice(0, -1));
       setTableData(
@@ -93,6 +94,7 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
   };
   const handleInputBlur = () => {
     setEditingCell(null);
+    console.log(tableData);
   };
 
   const handleHeaderClick = (colIndex: number) => {
@@ -235,10 +237,19 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                             autoFocus
                           />
                         ) : (
-                          value ?? "asdasd"
+                          value ?? ""
                         )}
                       </Td>
                     ))}
+                    <Flex
+                      // border={"1px"}
+                      // borderColor={"teal"}
+                      height={"54px"}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                    >
+                      <Checkbox></Checkbox>
+                    </Flex>
                   </Tr>
                 ))}
               </Tbody>
