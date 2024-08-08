@@ -5,21 +5,13 @@ import { Input } from "@chakra-ui/react";
 interface GridInputProps {
   value: string | number | readonly string[];
   type: ColumnType;
-  rowIndex: number;
-  colIndex: number;
-  onChange: (
-    event: React.ChangeEvent<HTMLInputElement>,
-    rowIndex: number,
-    colIndex: number
-  ) => void;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur: () => void;
 }
 
 export const GridInput: React.FC<GridInputProps> = ({
   value,
   type,
-  rowIndex,
-  colIndex,
   onChange,
   onBlur,
 }) => {
@@ -30,7 +22,7 @@ export const GridInput: React.FC<GridInputProps> = ({
           value={value}
           size={"sm"}
           variant={"unstyled"}
-          onChange={(event) => onChange(event, rowIndex, colIndex)}
+          onChange={onChange}
           onBlur={onBlur}
           autoFocus
         />
@@ -42,9 +34,10 @@ export const GridInput: React.FC<GridInputProps> = ({
           size={"sm"}
           type="number"
           variant={"unstyled"}
-          onChange={(event) => onChange(event, rowIndex, colIndex)}
+          onChange={onChange}
           onBlur={onBlur}
           autoFocus
+          required
         />
       );
     case ColumnType.Email:
@@ -54,9 +47,10 @@ export const GridInput: React.FC<GridInputProps> = ({
           size={"sm"}
           type="email"
           variant={"unstyled"}
-          onChange={(event) => onChange(event, rowIndex, colIndex)}
+          onChange={onChange}
           onBlur={onBlur}
           autoFocus
+          required
         />
       );
     case ColumnType.RegexpValidated:
@@ -65,7 +59,7 @@ export const GridInput: React.FC<GridInputProps> = ({
           value={value}
           size={"sm"}
           variant={"unstyled"}
-          onChange={(event) => onChange(event, rowIndex, colIndex)}
+          onChange={onChange}
           onBlur={onBlur}
           autoFocus
         />

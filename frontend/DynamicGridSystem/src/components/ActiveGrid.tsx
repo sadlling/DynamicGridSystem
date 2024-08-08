@@ -15,8 +15,9 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuItem,
   Checkbox,
+  MenuOptionGroup,
+  MenuItemOption,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import ColumnType from "../types/Grid";
@@ -118,7 +119,6 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
   };
   const handleInputBlur = () => {
     setEditingCell(null);
-    console.log(tableData);
   };
 
   const handleHeaderClick = (colIndex: number) => {
@@ -139,11 +139,39 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
       return newHeaders;
     });
   };
+
+  const isValueValid = (
+    value: string | number | readonly string[],
+    type: ColumnType
+  ) => {
+    switch (type) {
+      case ColumnType.String:
+      case ColumnType.Email:
+      case ColumnType.RegexpValidated:
+        return typeof value === "string";
+      case ColumnType.Numeric:
+        return !isNaN(Number(value));
+      case ColumnType.ExternalCollection:
+      case ColumnType.SingleSelect:
+      case ColumnType.MultiSelect:
+    }
+  };
+
   const handleColumnTypeChange = (colIndex: number, newType: ColumnType) => {
     setColumnTypes((prevTypes) => {
       const newTypes = [...prevTypes];
       newTypes[colIndex] = newType;
       return newTypes;
+    });
+    setTableData((prevData) => {
+      const newData = prevData.map((row) => {
+        const newValues = [...row.values];
+        if (!isValueValid(newValues[colIndex], newType)) {
+          newValues[colIndex] = "";
+        }
+        return { ...row, values: newValues };
+      });
+      return newData;
     });
   };
 
@@ -191,7 +219,7 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                       ) : (
                         <Box w={"100%"} gap={4}>
                           {columnHeaders[colIndex]}
-                          <Menu>
+                          <Menu closeOnSelect={false}>
                             <MenuButton
                               as={IconButton}
                               aria-label="Options"
@@ -199,25 +227,32 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                               variant="unstyled"
                             />
                             <MenuList>
-                              {(
-                                Object.keys(ColumnType) as Array<
-                                  keyof typeof ColumnType
-                                >
-                              ).map((value, index) => (
-                                <MenuItem
-                                  key={index}
-                                  onClick={() =>
-                                    handleColumnTypeChange(
-                                      colIndex,
-                                      ColumnType[
-                                        value as keyof typeof ColumnType
-                                      ]
-                                    )
-                                  }
-                                >
-                                  {value}
-                                </MenuItem>
-                              ))}
+                              <MenuOptionGroup
+                                title="Change column type"
+                                type="radio"
+                                value={columnTypes[colIndex]}
+                              >
+                                {(
+                                  Object.keys(ColumnType) as Array<
+                                    keyof typeof ColumnType
+                                  >
+                                ).map((value, index) => (
+                                  <MenuItemOption
+                                    key={index}
+                                    value={value}
+                                    onClick={() =>
+                                      handleColumnTypeChange(
+                                        colIndex,
+                                        ColumnType[
+                                          value as keyof typeof ColumnType
+                                        ]
+                                      )
+                                    }
+                                  >
+                                    {value}
+                                  </MenuItemOption>
+                                ))}
+                              </MenuOptionGroup>
                             </MenuList>
                           </Menu>
                         </Box>
@@ -260,25 +295,12 @@ export const ActiveGrid: React.FC<DataTableProps> = ({ data = [] }) => {
                           <GridInput
                             value={value}
                             type={columnTypes[colIndex]}
-                            rowIndex={rowIndex}
-                            colIndex={colIndex}
                             onChange={(event) =>
-                              handleInputChange(event, colIndex, rowIndex)
+                              handleInputChange(event, rowIndex, colIndex)
                             }
                             onBlur={handleInputBlur}
                           ></GridInput>
                         ) : (
-                          //TODO:FIX render values
-                          // <Input
-                          //   value={value}
-                          //   size={"sm"}
-                          //   variant={"unstyled"}
-                          //   onChange={(event) =>
-                          //     handleInputChange(event, rowIndex, colIndex)
-                          //   }
-                          //   onBlur={handleInputBlur}
-                          //   autoFocus
-                          // />
                           value ?? ""
                         )}
                       </Td>
